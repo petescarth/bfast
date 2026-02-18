@@ -50287,7 +50287,7 @@ FUTHARK_PRIMTYPES = {
              'bin_reader': read_bin_bool,
              'str_reader': read_str_bool,
              'bin_format': 'b',
-             'numpy_type': np.bool }
+             'numpy_type': bool }
 }
 
 def read_bin_read_type(f):
@@ -50708,7 +50708,7 @@ def sext_T_i64(x):
   return np.int64(x)
 
 def itob_T_bool(x):
-  return np.bool(x)
+  return bool(x)
 
 def btoi_bool_i8(x):
   return np.int8(x)
@@ -51211,7 +51211,7 @@ class Server:
                 # In case we are using the PyOpenCL backend, we first
                 # need to convert OpenCL arrays to ordinary NumPy
                 # arrays.  We do this in a nasty way.
-                if isinstance(value, np.number) or isinstance(value, np.bool) or isinstance(value, np.bool_) or isinstance(value, np.ndarray):
+                if isinstance(value, np.number) or isinstance(value, bool) or isinstance(value, np.bool_) or isinstance(value, np.ndarray):
                     # Ordinary NumPy value.
                     f.write(construct_binary_value(self._vars[vname]))
                 else:
