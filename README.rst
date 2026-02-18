@@ -4,6 +4,27 @@ bfast
 
 The bfast package provides a highly-efficient parallel implementation for the `Breaks For Additive Season and Trend (BFASTmonitor) <https://bfast.r-forge.r-project.org>`_ proposed by Verbesselt et al. The implementation is based on `OpenCL <https://www.khronos.org/opencl>`_.
 
+================
+Fork Information
+================
+
+This repository is a fork of `diku-dk/bfast:master <https://github.com/diku-dk/bfast>`_. It includes several updates to support modern Python environments and dependencies:
+
+**Build System Migration**
+
+- Migrated to `setuptools` and fixed deprecated API usage.
+- Replaced deprecated `numpy.distutils` with standard `setuptools` in `setup.py`.
+- Updated `requirements.txt` to support modern library versions (NumPy >= 1.24, Pandas >= 2.0).
+
+**Compatibility Fixes**
+
+Addressed compatibility issues arising from dependency upgrades:
+
+- Replaced removed NumPy types (`np.int`, `np.float`, `np.bool`) with native Python types.
+- Replaced deprecated `np.warnings` with the standard `warnings` module.
+- Updated Sphinx configuration to use `add_css_file`.
+- Fixed dictionary iteration (`iteritems` -> `items`) and Matplotlib usage.
+
 =============
 Documentation
 =============
