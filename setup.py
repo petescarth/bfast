@@ -8,9 +8,9 @@ with open('README.rst') as f:
     LONG_DESCRIPTION = f.read()
 MAINTAINER = 'Dmitry Serykh'
 MAINTAINER_EMAIL = 'dmitry.serykh@gmail.com'
-URL = 'http://bfast.readthedocs.io'
+URL = 'https://bfast.readthedocs.io'
 LICENSE = 'GNU GENERAL PUBLIC LICENSE'
-DOWNLOAD_URL = 'https://github.com/diku-dk/bfast'
+DOWNLOAD_URL = 'https://github.com/petescarth/bfast'
 
 # Read version directly or import if safe. 
 # Importing bfast might fail if dependencies are not installed, so let's try to find it or just assume it is in the package.
