@@ -403,7 +403,7 @@ def get_critval(h, period, level, mr):
     # Sanity check
     check(h, period, level, mr)
 
-    index = np.zeros(4, dtype=np.int)
+    index = np.zeros(4, dtype=int)
 
     # Get index into table from arguments
     index[0] = np.where(mr == __critval_mr)[0][0]

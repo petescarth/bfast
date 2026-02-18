@@ -75,7 +75,7 @@ means = model.means
 no_breaks_indices = (breaks == -1)
 means[no_breaks_indices] = 0
 means[means > 0] = 0
-breaks_plot = breaks.astype(numpy.float)
+breaks_plot = breaks.astype(float)
 breaks_plot[breaks == -2] = numpy.nan
 breaks_plot[breaks == -1] = numpy.nan
 breaks_plot[means >= 0] = numpy.nan
@@ -112,12 +112,12 @@ bounds = numpy.linspace(0, 6, 7)
 norm = matplotlib.colors.BoundaryNorm(bounds, cmap.N)
 
 fig, axes = plt.subplots(nrows=1, ncols=1, figsize=(10, 10))
-im = axes.imshow(breaks_plot_years, cmap=cmap, vmin=0, vmax=6, norm=norm)
+im = axes.imshow(breaks_plot_years, cmap=cmap, norm=norm)
 fig.subplots_adjust(right=0.8)
 cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
 fig.colorbar(im, cax=cbar_ax, ticks=[0, 1, 2, 3, 4, 5, 6])
 labels = cbar_ax.set_yticklabels(['2010', '2011', '2012', '2013', '2014', '2015', '2016'])
 
-plt.show()
+# plt.show()
 
-# plt.savefig("peru_python1.png")
+plt.savefig("peru_python1.png")

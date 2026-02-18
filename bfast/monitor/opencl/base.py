@@ -132,7 +132,7 @@ class BFASTMonitorOpenCL(BFASTMonitorBase):
             print("---------------------------------------------------------------------------------")
             print("Attributes:\n")
             attributes = self.device.get_attributes()
-            for (key, value) in attributes.iteritems():
+            for (key, value) in attributes.items():
                 print("\t%s:%s" % (str(key), str(value)))
             print("=================================================================================")
 
