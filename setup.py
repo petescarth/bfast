@@ -76,6 +76,7 @@ setup(
         'scipy>=1.10',
         'matplotlib>=3.7',
         'wget>=3.2',
+        'numba>=0.57',
     ],
     classifiers=[
         'Intended Audience :: Science/Research',
