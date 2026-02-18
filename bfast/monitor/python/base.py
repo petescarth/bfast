@@ -15,6 +15,7 @@ from sklearn import linear_model
 
 from bfast.base import BFASTMonitorBase
 from bfast.monitor.utils import compute_end_history, compute_lam, map_indices
+from bfast.monitor.python.optimized import fit_optimized_loop
 
 
 class BFASTMonitorPython(BFASTMonitorBase):
@@ -136,47 +137,40 @@ class BFASTMonitorPython(BFASTMonitorBase):
 
         # create (complete) seasonal matrix ("patterns" as columns here!)
         self.mapped_indices = map_indices(dates).astype(np.int32)
-        self.X = self._create_data_matrix(self.mapped_indices)
+        self.X = self._create_data_matrix(self.mapped_indices).astype(np.float32)
 
         # period = data.shape[0] / float(self.n)
         self.lam = compute_lam(data.shape[0], self.hfrac, self.level, self.period)
 
-        if self.use_mp:
-            print("Python backend is running in parallel using {} threads".format(mp.cpu_count()))
-            y = np.transpose(data, (1, 2, 0)).reshape(data.shape[1] * data.shape[2], data.shape[0])
-            pool = mp.Pool(mp.cpu_count())
-            p_map = pool.map(self.fit_single, y)
-            rval = np.array(p_map, dtype=object).reshape(data.shape[1], data.shape[2], 4)
+        # Use optimized Numba implementation
+        means_global = np.zeros((data.shape[1], data.shape[2]), dtype=np.float32)
+        magnitudes_global = np.zeros((data.shape[1], data.shape[2]), dtype=np.float32)
+        breaks_global = np.zeros((data.shape[1], data.shape[2]), dtype=np.int32)
+        valids_global = np.zeros((data.shape[1], data.shape[2]), dtype=np.int32)
 
-            self.breaks = rval[:,:,0].astype(np.int32)
-            self.means = rval[:,:,1].astype(np.float32)
-            self.magnitudes = rval[:,:,2].astype(np.float32)
-            self.valids = rval[:,:,3].astype(np.int32)
-        else:
-            means_global = np.zeros((data.shape[1], data.shape[2]), dtype=np.float32)
-            magnitudes_global = np.zeros((data.shape[1], data.shape[2]), dtype=np.float32)
-            breaks_global = np.zeros((data.shape[1], data.shape[2]), dtype=np.int32)
-            valids_global = np.zeros((data.shape[1], data.shape[2]), dtype=np.int32)
-
-            for i in range(data.shape[1]):
-                if self.verbose > 0:
-                    print("Processing row {}".format(i))
-
-                for j in range(data.shape[2]):
-                    y = data[:,i,j]
-                    (pix_break,
-                     pix_mean,
-                     pix_magnitude,
-                     pix_num_valid) = self.fit_single(y)
-                    breaks_global[i,j] = pix_break
-                    means_global[i,j] = pix_mean
-                    magnitudes_global[i,j] = pix_magnitude
-                    valids_global[i,j] = pix_num_valid
-
-            self.breaks = breaks_global
-            self.means = means_global
-            self.magnitudes = magnitudes_global
-            self.valids = valids_global
+        # Flatten data for optimized loop
+        # data is (N, W, H)
+        # We need to iterate over W*H
+        # optimized.fit_optimized_loop expects (n_pixels, N)
+        # Transpose data to (W, H, N)
+        data_transposed = np.transpose(data, (1, 2, 0))
+        # Flatten to (W*H, N)
+        data_flat = data_transposed.reshape(data.shape[1] * data.shape[2], data.shape[0])
+        
+        # Output arrays flat
+        breaks_flat = np.zeros(data_flat.shape[0], dtype=np.int32)
+        means_flat = np.zeros(data_flat.shape[0], dtype=np.float32)
+        magnitudes_flat = np.zeros(data_flat.shape[0], dtype=np.float32)
+        valids_flat = np.zeros(data_flat.shape[0], dtype=np.int32)
+        
+        fit_optimized_loop(data_flat, self.X, self.n, self.hfrac, self.level,
+                           self.k, self.trend, self.lam, self.mapped_indices,
+                           breaks_flat, means_flat, magnitudes_flat, valids_flat)
+        
+        self.breaks = breaks_flat.reshape(data.shape[1], data.shape[2])
+        self.means = means_flat.reshape(data.shape[1], data.shape[2])
+        self.magnitudes = magnitudes_flat.reshape(data.shape[1], data.shape[2])
+        self.valids = valids_flat.reshape(data.shape[1], data.shape[2])
 
         return self
 
